@@ -457,14 +457,27 @@ export const render = (props) => {
   const idx = getIdx(graphs.length);
   const m = graphs[idx];
   const cells = m.cells.slice(-(COLS * ROWS));
-  // Render row 0 last so it lands at the bottom of each column.
-  const rowOrder = [...Array(ROWS).keys()].slice(1).concat(0);
+  // Natural row order: row 0 sits at the top of each column.
+  const rowOrder = [...Array(ROWS).keys()];
+  const lastRi = rowOrder.length - 1;
   const columns = [];
   for (let c = 0; c < COLS; c++) {
-    const cellEls = rowOrder.map((r) => {
+    const cellEls = rowOrder.map((r, ri) => {
       const cell = cells[c * ROWS + r] || { level: 0, date: "", count: 0 };
       const tip = cell.date ? `${cell.date}: ${cell.count} contribution${cell.count === 1 ? "" : "s"}` : "";
-      return <div key={r} className="cell" title={tip} style={{ background: RAMP[cell.level || 0] }} />;
+      // The first tile (top-left) is the move handle; the last tile
+      // (bottom-right) is the resize handle.
+      const isFirst = c === 0 && ri === 0;
+      const isLast = c === COLS - 1 && ri === lastRi;
+      const ref = isFirst ? (n) => initDrag(n, "mosaic")
+                : isLast ? (n) => initResize(n, "mosaic")
+                : undefined;
+      const cursor = isFirst ? "grab" : isLast ? "nwse-resize" : undefined;
+      const title = isFirst ? "Drag to move · double-click to reset"
+                  : isLast ? "Drag to resize · double-click to reset"
+                  : tip;
+      return <div key={r} className="cell" title={title} ref={ref}
+                  style={{ background: RAMP[cell.level || 0], cursor }} />;
     });
     columns.push(<div key={c} className="col">{cellEls}</div>);
   }
@@ -472,8 +485,6 @@ export const render = (props) => {
   return (
     <div aria-label={`GitHub contributions for ${m.user}: ${m.streak} day streak, ${m.total} this year`}
          onClick={() => run(`open "https://github.com/${m.user}"`)}>
-      <DragHandle k="mosaic" />
-      <ResizeHandle k="mosaic" />
       <div className="grid">{columns}</div>
       {graphs.length > 1 && (
         <div className="nav">
