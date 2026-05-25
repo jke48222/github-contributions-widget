@@ -12,7 +12,7 @@ if [ -z "$W" ] || [ ! -f "$W/index.jsx" ]; then
 fi
 
 current="$(sed -n 's/^const USERS = \["\(.*\)"\];/\1/p' "$W/index.jsx" | head -1)"
-printf "Your GitHub username [%s]: " "${current:-your-handle}"; read -r u
+printf "Your GitHub username (Ex: jke48222): "; read -r u
 u="${u:-$current}"
 if [ -n "$u" ]; then
   sed -i '' "s|^const USERS = \[.*\];|const USERS = [\"$u\"];|" "$W/index.jsx"

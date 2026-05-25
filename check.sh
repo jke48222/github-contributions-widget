@@ -78,6 +78,20 @@ case "$NAME" in
     u="$(sed -n 's/^const USERS = \["\(.*\)"\];/\1/p' "$WIDGETS/$NAME/index.jsx" 2>/dev/null | head -1)"
     [ -n "$u" ] && pass "GitHub username set: $u" || warn "set your username via ./install.sh"
     ;;
+  wallpaper-switcher.widget)
+    if [ -d "$HOME/Pictures/Wallpapers" ]; then
+      n=$(/bin/ls -1 "$HOME/Pictures/Wallpapers" 2>/dev/null | grep -ivE '^\.' | wc -l | tr -d ' ')
+      [ "$n" -gt 0 ] && pass "~/Pictures/Wallpapers has $n file(s)" || warn "~/Pictures/Wallpapers is empty — add images"
+    else
+      warn "~/Pictures/Wallpapers missing — run ./install.sh"
+    fi
+    check_music_automation 2>/dev/null || true
+    ;;
+  daily-astronomy-photo.widget)
+    key="$(sed -n 's/^const API_KEY = "\(.*\)";/\1/p' "$WIDGETS/$NAME/index.jsx" 2>/dev/null | head -1)"
+    [ "$key" = "DEMO_KEY" ] && warn "using NASA DEMO_KEY (throttled) — add your own via ./install.sh" \
+      || pass "NASA API key configured"
+    ;;
 esac
 
 echo "Done."
