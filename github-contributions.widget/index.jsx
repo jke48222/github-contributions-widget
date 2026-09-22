@@ -1,4 +1,4 @@
-import { React } from "uebersicht";
+import { React, run } from "uebersicht";
 // --- Inlined design system (self-contained; formerly theme.js) ---
 // Shared design system for the widget set: color tokens, fonts, layout, the
 // common card shell, drag/resize handles, a last-known-good cache, and the
@@ -131,7 +131,7 @@ const card = (variant, w, h, x = 0, y = 0) => `
   .ws-drag  { position:absolute; top:6px; left:6px; z-index:30;
               width:18px; height:18px; border-radius:6px;
               display:flex; align-items:center; justify-content:center;
-              font-size:11px; line-height:1; cursor:grab; opacity:0.42;
+              font-size:11px; line-height:1; cursor:grab; opacity:0.22;
               transition:opacity .15s ease; user-select:none;
               -webkit-user-select:none;
               color:${variant === "dark" ? T.onDarkMute : T.inkMute};
@@ -143,7 +143,7 @@ const card = (variant, w, h, x = 0, y = 0) => `
   .ws-resize { position:absolute; bottom:5px; right:5px; z-index:30;
                width:16px; height:16px; border-radius:5px;
                display:flex; align-items:center; justify-content:center;
-               font-size:11px; line-height:1; cursor:nwse-resize; opacity:0.42;
+               font-size:11px; line-height:1; cursor:nwse-resize; opacity:0.22;
                transition:opacity .15s ease; user-select:none;
                -webkit-user-select:none;
                color:${variant === "dark" ? T.onDarkMute : T.inkMute};
@@ -344,6 +344,7 @@ const resolve = (key, props, parse, mock) => {
   return { data: mock, mock: true };
 };
 // --- End inlined design system ---
+
 // GitHub contribution graph with current streak and yearly total.
 //
 // Each username is fetched once per refresh; with multiple usernames, arrows
@@ -374,42 +375,19 @@ const ROWS = 7;
 const COLS = 19;
 const RAMP = [T.ghEmpty, T.ghGreen1, T.ghGreen2, T.ghGreen3, T.ghGreen4];
 const LVL = { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 };
-const FONTS = "github-contributions.widget/fonts";
-// A cross-stitch sampler in a bamboo embroidery hoop: the last nineteen weeks
-// stitched in four greens of floss on natural Aida cloth, a navy stitched
-// border, two red hearts, and the name, streak, total, and year worked in a
-// bitmap face that reads as stitching. Click the cloth to open the profile.
-export const className = card("light", 300, 316, ...LAYOUT.mosaic) + `
-  @font-face { font-family: "Silkscreen"; src: url("${FONTS}/Silkscreen-400.woff2") format("woff2"); font-weight: 400; }
-  @font-face { font-family: "Silkscreen"; src: url("${FONTS}/Silkscreen-700.woff2") format("woff2"); font-weight: 700; }
-  --px: "Silkscreen", monospace; --linen: #EFE6D3; --navy: #2F3B60; --red: #C4444C;
-  background: transparent; box-shadow: none; backdrop-filter: none; padding: 0; overflow: visible; user-select:none; -webkit-user-select:none;
-  .ws-drag { top: 40px; left: 44px; color: #6b5a3a; background: rgba(0,0,0,0.06); } .ws-resize { bottom: 40px; right: 44px; color: #6b5a3a; background: rgba(0,0,0,0.06); }
-  .hoop { position:absolute; left: 0; top: 16px; width: 300px; height: 300px; border-radius: 50%;
-          background: conic-gradient(from 20deg, #D8B67C, #B58C55 22%, #D6B27A 40%, #C39A60 58%, #DDBB82 76%, #B8905A 90%, #D8B67C);
-          box-shadow: 0 30px 50px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(90,60,20,0.45), inset 0 1px 0 rgba(255,255,255,0.35); }
-  .hoop::before { content:""; position:absolute; inset: 7px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(90,60,20,0.35), 0 0 0 1px rgba(255,255,255,0.25); }
-  .hoop::after { content:""; position:absolute; inset: 0; border-radius: 50%; pointer-events:none; opacity: 0.5; mix-blend-mode: multiply; background: repeating-linear-gradient(90deg, rgba(80,50,10,0.10) 0 1px, rgba(0,0,0,0) 1px 5px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E"); }
-  .cloth { position:absolute; left: 16px; top: 32px; width: 268px; height: 268px; border-radius: 50%; overflow: hidden; cursor: pointer;
-           background: radial-gradient(circle, rgba(80,60,30,0.18) 0.6px, rgba(0,0,0,0) 1.1px) 0 0 / 4px 4px, repeating-linear-gradient(0deg, rgba(255,255,255,0.35) 0 1px, rgba(0,0,0,0) 1px 4px), repeating-linear-gradient(90deg, rgba(120,100,60,0.08) 0 1px, rgba(0,0,0,0) 1px 4px), var(--linen);
-           box-shadow: inset 0 0 26px rgba(90,60,20,0.35), inset 0 0 0 1px rgba(90,60,20,0.3); }
-  .clamp { position:absolute; left: 50%; top: 6px; width: 30px; height: 24px; margin-left: -15px; border-radius: 3px; background: linear-gradient(180deg, #E8C888, #A07A3E); box-shadow: 0 2px 3px rgba(0,0,0,0.4), inset 0 0 0 1px #7A5A26; }
-  .clamp::before { content:""; position:absolute; left: 50%; top: -8px; width: 10px; height: 12px; margin-left: -5px; border-radius: 2px; background: linear-gradient(90deg, #8C6E38, #E2C27C 45%, #8C6E38); box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
-  .clamp::after { content:""; position:absolute; left: 50%; top: -3px; width: 22px; height: 3px; margin-left: -11px; border-radius: 2px; background: #6E5222; }
-  .st { position:absolute; width: 9px; height: 9px; pointer-events:none; }
-  .st::before, .st::after { content:""; position:absolute; left: 50%; top: 50%; width: 11px; height: 3px; margin: -1.5px 0 0 -5.5px; border-radius: 2px; background: var(--c); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 0.5px 0.6px rgba(0,0,0,0.35); }
-  .st::before { transform: rotate(45deg); } .st::after { transform: rotate(-45deg); }
-  .st.s { width: 5px; height: 5px; } .st.s::before, .st.s::after { width: 6px; height: 2px; margin: -1px 0 0 -3px; }
-  .l0 { --c: #DED3BD; } .l1 { --c: #B3D3A3; } .l2 { --c: #78B76E; } .l3 { --c: #3E8F45; } .l4 { --c: #1E5E2B; }
-  .navy { --c: #2F3B60; } .red { --c: #C4444C; }
-  .txt { position:absolute; font-family: var(--px); color: var(--navy); text-align:center; white-space:nowrap; pointer-events:none; text-shadow: 0 0.5px 0 rgba(255,255,255,0.5); }
-  .user { left: 0; width: 300px; top: 84px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
-  .num { top: 226px; width: 100px; font-size: 16px; font-weight: 700; color: var(--red); }
-  .lab { top: 246px; width: 100px; font-size: 7px; letter-spacing: 0.5px; color: var(--navy); }
-  .year { left: 0; width: 300px; top: 268px; font-size: 8px; color: #7A6A4A; }
-  .nav { position:absolute; top: 62px; left: 0; width: 300px; text-align: center; font: 700 10px/1 var(--px); color: var(--navy); }
-  .arrow { cursor:pointer; padding: 0 14px; } .arrow:hover { color: var(--red); }
+
+export const className = card("dark", 360, 200, ...LAYOUT.mosaic) + `
+  background: transparent; box-shadow: none; backdrop-filter: none;
+  padding: 14px; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; cursor: pointer;
+  .grid    { display:flex; gap:3px; }
+  .col     { display:flex; flex-direction:column; gap:3px; }
+  .cell    { width:14px; height:14px; border-radius:3px; }
+  .nav     { display:flex; align-items:center; gap:10px; margin-top:8px;
+             ${caption(T.onDarkMute)} font-size:9px; }
+  .arrow   { cursor:pointer; user-select:none; font-size:12px; padding:0 4px; }
 `;
+
 // Deterministic level pattern so a failed fetch still reads as a real graph.
 const seeded = (n) => {
   let s = 7;
@@ -472,30 +450,49 @@ const stepUser = (len, delta) => (e) => {
   run("true");
 };
 
-const PITCH = 11, GX = 46, GY = 112;
-const HEART = [".xx.xx.", "xxxxxxx", ".xxxxx.", "..xxx..", "...x..."];
-const heart = (x, y, key) => HEART.flatMap((row, r) => row.split("").map((ch, c) => ch === "x" ? <span key={`${key}-${r}-${c}`} className="st s red" style={{ left: x + c * 5, top: y + r * 5 }} /> : null));
-const BORDER = (() => { const out = []; for (let c = -1; c <= COLS; c++) { out.push([c, -1]); out.push([c, ROWS]); } for (let r = 0; r < ROWS; r++) { out.push([-1, r]); out.push([COLS, r]); } return out; })();
 export const render = (props) => {
   const { data: graphs, loading } = resolve("mosaic", props, parse, MOCK);
   if (loading) return <Skel tint={T.ghGreen2} />;
-  const idx = getIdx(graphs.length); const m = graphs[idx];
+
+  const idx = getIdx(graphs.length);
+  const m = graphs[idx];
   const cells = m.cells.slice(-(COLS * ROWS));
+  // Natural row order: row 0 sits at the top of each column.
+  const rowOrder = [...Array(ROWS).keys()];
+  const lastRi = rowOrder.length - 1;
+  const columns = [];
+  for (let c = 0; c < COLS; c++) {
+    const cellEls = rowOrder.map((r, ri) => {
+      const cell = cells[c * ROWS + r] || { level: 0, date: "", count: 0 };
+      const tip = cell.date ? `${cell.date}: ${cell.count} contribution${cell.count === 1 ? "" : "s"}` : "";
+      // The first tile (top-left) is the move handle; the last tile
+      // (bottom-right) is the resize handle.
+      const isFirst = c === 0 && ri === 0;
+      const isLast = c === COLS - 1 && ri === lastRi;
+      const ref = isFirst ? (n) => initDrag(n, "mosaic")
+                : isLast ? (n) => initResize(n, "mosaic")
+                : undefined;
+      const cursor = isFirst ? "grab" : isLast ? "nwse-resize" : undefined;
+      const title = isFirst ? "Drag to move · double-click to reset"
+                  : isLast ? "Drag to resize · double-click to reset"
+                  : tip;
+      return <div key={r} className="cell" title={title} ref={ref}
+                  style={{ background: RAMP[cell.level || 0], cursor }} />;
+    });
+    columns.push(<div key={c} className="col">{cellEls}</div>);
+  }
+
   return (
-    <div aria-label={`GitHub contributions for ${m.user}: ${m.streak} day streak, ${m.total} this year`}>
-      <div className="hoop" />
-      <div className="cloth" title={`Open github.com/${m.user}`} onClick={() => run(`open "https://github.com/${m.user}"`)} />
-      <div className="clamp" />
-      {heart(58, 80, "hl")}{heart(207, 80, "hr")}
-      <div className="txt user">@{m.user}</div>
-      {BORDER.map(([c, r]) => <span key={`b${c}_${r}`} className="st navy" style={{ left: GX + c * PITCH, top: GY + r * PITCH }} />)}
-      {Array.from({ length: COLS * ROWS }, (_, i) => { const cell = cells[i] || { level: 0 }; const c = Math.floor(i / ROWS), r = i % ROWS; return <span key={i} className={`st l${cell.level || 0}`} style={{ left: GX + c * PITCH, top: GY + r * PITCH }} />; })}
-      <div className="txt num" style={{ left: 40 }}>{m.streak}</div><div className="txt lab" style={{ left: 40 }}>DAY STREAK</div>
-      <div className="txt num" style={{ left: 160 }}>{m.total}</div><div className="txt lab" style={{ left: 160 }}>THIS YEAR</div>
-      <div className="txt year">{new Date().getFullYear()}</div>
-      {graphs.length > 1 && (<div className="nav"><span className="arrow" onClick={stepUser(graphs.length, -1)}>&#x2039;</span><span className="arrow" onClick={stepUser(graphs.length, 1)}>&#x203A;</span></div>)}
-      <DragHandle k="mosaic" />
-      <ResizeHandle k="mosaic" />
+    <div aria-label={`GitHub contributions for ${m.user}: ${m.streak} day streak, ${m.total} this year`}
+         onClick={() => run(`open "https://github.com/${m.user}"`)}>
+      <div className="grid">{columns}</div>
+      {graphs.length > 1 && (
+        <div className="nav">
+          <span className="arrow" onClick={stepUser(graphs.length, -1)}>&#x2039;</span>
+          <span>{m.user}</span>
+          <span className="arrow" onClick={stepUser(graphs.length, 1)}>&#x203A;</span>
+        </div>
+      )}
     </div>
   );
 };
