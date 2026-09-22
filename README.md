@@ -1,6 +1,6 @@
 # github-contributions
 
-> A GitHub contribution graph with current streak, yearly total, and per-day tooltips.
+> Your GitHub contribution graph cross-stitched in an embroidery hoop, with streak and yearly total.
 
 [![Release](https://img.shields.io/github/v/release/jke48222/github-contributions-widget?label=release)](https://github.com/jke48222/github-contributions-widget/releases/latest) [![License: MIT](https://img.shields.io/github/license/jke48222/github-contributions-widget)](LICENSE) ![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey)
 
@@ -12,7 +12,7 @@ runs on any Mac with no extra files beyond the bundled assets.
 
 ![screenshot](media/screenshot.png)
 
-The year is an LED matrix panel: a black bezel around a field of LEDs behind a screen-door grid, with unlit ones faintly visible, and a seven-segment counter for the streak and the total. Typefaces: DSEG7 Classic and Barlow Condensed. All fonts are under the SIL Open Font License; see `github-contributions.widget/fonts/OFL.txt`.
+The year is a cross-stitch sampler in a bamboo embroidery hoop: the last nineteen weeks stitched in four greens of floss on natural Aida cloth, a navy stitched border, two red hearts, and the name, streak, total, and year worked in a bitmap face that reads as stitching. Typeface: Silkscreen. All fonts are under the SIL Open Font License; see `github-contributions.widget/fonts/OFL.txt`.
 
 ## Before and after
 
