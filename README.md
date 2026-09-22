@@ -12,13 +12,17 @@ runs on any Mac with no extra files beyond the bundled assets.
 
 ![screenshot](media/screenshot.png)
 
+The year is an LED matrix panel: a black bezel around a field of LEDs behind a screen-door grid, with unlit ones faintly visible, and a seven-segment counter for the streak and the total. Typefaces: DSEG7 Classic and Barlow Condensed. All fonts are under the SIL Open Font License; see `github-contributions.widget/fonts/OFL.txt`.
+
+## Before and after
+
+![Before and after](media/before-after.png)
+
 ### On the desktop
 
 The widget running alongside the full set:
 
-![The Übersicht widget suite running on a desktop](https://raw.githubusercontent.com/jke48222/widget-suite/main/homescreen.gif)
-
-[Full-resolution video](media/homescreen.mp4)
+![The Übersicht widget suite composed on one desktop](https://raw.githubusercontent.com/jke48222/widget-suite/main/homescreen.png)
 
 ## Requirements
 

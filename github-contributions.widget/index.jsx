@@ -1,4 +1,4 @@
-import { React, run } from "uebersicht";
+import { React } from "uebersicht";
 // --- Inlined design system (self-contained; formerly theme.js) ---
 // Shared design system for the widget set: color tokens, fonts, layout, the
 // common card shell, drag/resize handles, a last-known-good cache, and the
@@ -131,7 +131,7 @@ const card = (variant, w, h, x = 0, y = 0) => `
   .ws-drag  { position:absolute; top:6px; left:6px; z-index:30;
               width:18px; height:18px; border-radius:6px;
               display:flex; align-items:center; justify-content:center;
-              font-size:11px; line-height:1; cursor:grab; opacity:0.22;
+              font-size:11px; line-height:1; cursor:grab; opacity:0.42;
               transition:opacity .15s ease; user-select:none;
               -webkit-user-select:none;
               color:${variant === "dark" ? T.onDarkMute : T.inkMute};
@@ -143,7 +143,7 @@ const card = (variant, w, h, x = 0, y = 0) => `
   .ws-resize { position:absolute; bottom:5px; right:5px; z-index:30;
                width:16px; height:16px; border-radius:5px;
                display:flex; align-items:center; justify-content:center;
-               font-size:11px; line-height:1; cursor:nwse-resize; opacity:0.22;
+               font-size:11px; line-height:1; cursor:nwse-resize; opacity:0.42;
                transition:opacity .15s ease; user-select:none;
                -webkit-user-select:none;
                color:${variant === "dark" ? T.onDarkMute : T.inkMute};
@@ -344,7 +344,6 @@ const resolve = (key, props, parse, mock) => {
   return { data: mock, mock: true };
 };
 // --- End inlined design system ---
-
 // GitHub contribution graph with current streak and yearly total.
 //
 // Each username is fetched once per refresh; with multiple usernames, arrows
@@ -376,18 +375,38 @@ const COLS = 19;
 const RAMP = [T.ghEmpty, T.ghGreen1, T.ghGreen2, T.ghGreen3, T.ghGreen4];
 const LVL = { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 };
 
-export const className = card("dark", 360, 200, ...LAYOUT.mosaic) + `
-  background: transparent; box-shadow: none; backdrop-filter: none;
-  padding: 14px; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; cursor: pointer;
-  .grid    { display:flex; gap:3px; }
-  .col     { display:flex; flex-direction:column; gap:3px; }
-  .cell    { width:14px; height:14px; border-radius:3px; }
-  .nav     { display:flex; align-items:center; gap:10px; margin-top:8px;
-             ${caption(T.onDarkMute)} font-size:9px; }
-  .arrow   { cursor:pointer; user-select:none; font-size:12px; padding:0 4px; }
+const FONTS = "github-contributions.widget/fonts";
+// The year as an LED matrix panel: a black bezel, a 19x7 field of LEDs behind
+// a screen-door grid (unlit ones still faintly there, the way a real panel
+// looks), a seven-segment counter for the streak and the total, and a
+// silkscreen legend. Clicking the panel opens the profile.
+export const className = card("dark", 380, 210, ...LAYOUT.mosaic) + `
+  @font-face { font-family: "DSEG7"; src: url("${FONTS}/DSEG7Classic-Bold.woff2") format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Barlow Condensed"; src: url("${FONTS}/BarlowCondensed-600.woff2") format("woff2"); font-weight: 600; }
+  --cond: "Barlow Condensed", "Arial Narrow", sans-serif;
+  padding: 0; border-radius: 10px; backdrop-filter: none; overflow: hidden; cursor: pointer; user-select:none; -webkit-user-select:none;
+  background: linear-gradient(180deg, #2A2A2E 0%, #151517 8%, #0F0F11 92%, #0A0A0B 100%);
+  box-shadow: 0 26px 50px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px #000;
+  .ws-drag { top: 6px; left: 6px; } .ws-resize { bottom: 6px; right: 6px; }
+  .panel { position:absolute; left: 16px; top: 16px; width: 348px; height: 132px; border-radius: 4px; background: #040504;
+           box-shadow: inset 0 0 0 1px #1A1B1A, inset 0 2px 12px rgba(0,0,0,0.9); padding: 9px;
+           display:grid; grid-template-columns: repeat(${COLS}, 1fr); grid-template-rows: repeat(${ROWS}, 1fr); grid-auto-flow: column; gap: 4px; }
+  .led { border-radius: 3px; background: #0F1A12; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.7); transition: background .3s; }
+  .led.l1 { background: #1B6D30; box-shadow: 0 0 4px rgba(46,160,77,0.35); }
+  .led.l2 { background: #2AA64E; box-shadow: 0 0 6px rgba(56,214,96,0.55); }
+  .led.l3 { background: #4EE07A; box-shadow: 0 0 8px rgba(80,240,120,0.7); }
+  .led.l4 { background: #C4FFD2; box-shadow: 0 0 10px rgba(180,255,200,0.95), 0 0 2px #fff; }
+  .foot { position:absolute; left: 16px; right: 16px; bottom: 11px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .silk { font: 600 7.5px/1.4 var(--cond); letter-spacing: 1.8px; color: #6F7276; text-transform:uppercase; }
+  .silk b { color: #A9ADB3; font-weight: 600; }
+  .seg { display:flex; gap: 14px; align-items:flex-end; }
+  .seg div { position:relative; text-align:right; }
+  .seg .n { font: 700 17px/1 "DSEG7", monospace; color: #39D353; text-shadow: 0 0 8px rgba(57,211,83,0.6); position:relative; }
+  .seg .g { position:absolute; right:0; top:0; font: 700 17px/1 "DSEG7", monospace; color: rgba(57,211,83,0.09); }
+  .seg .silk { display:block; margin-top: 3px; }
+  .nav { position:absolute; right: 16px; top: 2px; display:flex; gap: 6px; align-items:center; }
+  .arrow { font-size: 11px; color: #8A8C92; padding: 0 3px; cursor:pointer; }
 `;
-
 // Deterministic level pattern so a failed fetch still reads as a real graph.
 const seeded = (n) => {
   let s = 7;
@@ -453,46 +472,24 @@ const stepUser = (len, delta) => (e) => {
 export const render = (props) => {
   const { data: graphs, loading } = resolve("mosaic", props, parse, MOCK);
   if (loading) return <Skel tint={T.ghGreen2} />;
-
-  const idx = getIdx(graphs.length);
-  const m = graphs[idx];
+  const idx = getIdx(graphs.length); const m = graphs[idx];
   const cells = m.cells.slice(-(COLS * ROWS));
-  // Natural row order: row 0 sits at the top of each column.
-  const rowOrder = [...Array(ROWS).keys()];
-  const lastRi = rowOrder.length - 1;
-  const columns = [];
-  for (let c = 0; c < COLS; c++) {
-    const cellEls = rowOrder.map((r, ri) => {
-      const cell = cells[c * ROWS + r] || { level: 0, date: "", count: 0 };
-      const tip = cell.date ? `${cell.date}: ${cell.count} contribution${cell.count === 1 ? "" : "s"}` : "";
-      // The first tile (top-left) is the move handle; the last tile
-      // (bottom-right) is the resize handle.
-      const isFirst = c === 0 && ri === 0;
-      const isLast = c === COLS - 1 && ri === lastRi;
-      const ref = isFirst ? (n) => initDrag(n, "mosaic")
-                : isLast ? (n) => initResize(n, "mosaic")
-                : undefined;
-      const cursor = isFirst ? "grab" : isLast ? "nwse-resize" : undefined;
-      const title = isFirst ? "Drag to move · double-click to reset"
-                  : isLast ? "Drag to resize · double-click to reset"
-                  : tip;
-      return <div key={r} className="cell" title={title} ref={ref}
-                  style={{ background: RAMP[cell.level || 0], cursor }} />;
-    });
-    columns.push(<div key={c} className="col">{cellEls}</div>);
-  }
-
+  const pad = (n, w) => String(Math.max(0, n | 0)).padStart(w, "0");
   return (
-    <div aria-label={`GitHub contributions for ${m.user}: ${m.streak} day streak, ${m.total} this year`}
-         onClick={() => run(`open "https://github.com/${m.user}"`)}>
-      <div className="grid">{columns}</div>
-      {graphs.length > 1 && (
-        <div className="nav">
-          <span className="arrow" onClick={stepUser(graphs.length, -1)}>&#x2039;</span>
-          <span>{m.user}</span>
-          <span className="arrow" onClick={stepUser(graphs.length, 1)}>&#x203A;</span>
+    <div aria-label={`GitHub contributions for ${m.user}: ${m.streak} day streak, ${m.total} this year`} onClick={() => run(`open "https://github.com/${m.user}"`)}>
+      <DragHandle k="mosaic" />
+      <ResizeHandle k="mosaic" />
+      <div className="panel">
+        {Array.from({ length: COLS * ROWS }, (_, i) => { const c = cells[i] || { level: 0, date: "", count: 0 }; return <div key={i} className={`led l${c.level || 0}`} title={c.date ? `${c.date}: ${c.count} contribution${c.count === 1 ? "" : "s"}` : ""} />; })}
+      </div>
+      <div className="foot">
+        <div className="silk">github · <b>{m.user}</b><br />{COLS}×{ROWS} · last {COLS} weeks</div>
+        <div className="seg">
+          <div><span className="g">888</span><span className="n">{pad(m.streak, 3)}</span><span className="silk">day streak</span></div>
+          <div><span className="g">8888</span><span className="n">{pad(m.total, 4)}</span><span className="silk">this year</span></div>
         </div>
-      )}
+      </div>
+      {graphs.length > 1 && (<div className="nav"><span className="arrow" onClick={stepUser(graphs.length, -1)}>&#x2039;</span><span className="silk">{m.user}</span><span className="arrow" onClick={stepUser(graphs.length, 1)}>&#x203A;</span></div>)}
     </div>
   );
 };
